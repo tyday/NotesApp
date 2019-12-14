@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NotesApp.Model
 {
-    class User
+	public class User : INotifyPropertyChanged
     {
 
 		private int id;
