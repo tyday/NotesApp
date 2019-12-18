@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:NotesApp.View"
         xmlns:vm="clr-namespace:NotesApp.ViewModel"
         mc:Ignorable="d"
-        Title="NotesWindow" Height="300" Width="300">
+        Title="NotesWindow" Height="400" Width="600">
     <Window.Resources>
         <vm:NotesVM x:Key="viewModel"/>
     </Window.Resources>
@@ -23,8 +23,45 @@
                           Click="MenuItem_Click"/>
             </MenuItem>
         </Menu>
-        <Grid Background="LightBlue">
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem>
+                <TextBlock x:Name="statusTextBlock"/>
+            </StatusBarItem>
+        </StatusBar>
+        <ListView Width="140"
+                  DockPanel.Dock="Left"
+                  ItemsSource="{Binding Notebooks}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+            
+        </ListView>
+        <ListView Width="140"
+                  DockPanel.Dock="Left"
+                  SelectedItem="{Binding SelectedNotebook, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  ItemsSource="{Binding Notes}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Title}"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
 
+        </ListView>
+        <ToolBarTray DockPanel.Dock="Top">
+            <ToolBar>
+                <Button Content="Speech"
+                        Click="SpeechButton_Click"/>
+                <Button x:Name="boldButton" Click="boldButton_Click">
+                    <TextBlock Text="B"
+                        FontWeight="Bold"/>
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+        <Grid>
+            <RichTextBox x:Name="contentRichTextBox"
+                         TextChanged="contentRichTextBox_TextChanged"/>
         </Grid>
     </DockPanel>
 </Window>
