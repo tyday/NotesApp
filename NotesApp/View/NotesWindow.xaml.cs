@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Speech.Recognition;
@@ -24,6 +25,7 @@ namespace NotesApp.View
     public partial class NotesWindow : Window
     {
         SpeechRecognitionEngine recognizer;
+        List<double> fontSizes;
         public NotesWindow()
         {
             InitializeComponent();
@@ -40,6 +42,12 @@ namespace NotesApp.View
             recognizer.LoadGrammar(grammar);
             recognizer.SetInputToDefaultAudioDevice();
             recognizer.SpeechRecognized += Recognizer_SpeechRecognized;
+
+            var fontFamilies = Fonts.SystemFontFamilies.OrderBy(f => f.Source);
+            fontFamilyComboBox.ItemsSource = fontFamilies;
+
+            fontSizes = new List<double>() { 8, 9, 10, 11, 12, 14, 16, 28, 48,72 };
+            fontSizeComboBox.ItemsSource = fontSizes;
         }
 
         private void Recognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
@@ -92,13 +100,17 @@ namespace NotesApp.View
             var selectedStrikethrough = contentRichTextBox.Selection.GetPropertyValue(Inline.TextDecorationsProperty);
             TextDecorationCollection textDecorations;
             textDecorations = (contentRichTextBox.Selection.GetPropertyValue(Inline.TextDecorationsProperty) as TextDecorationCollection);
-            //TextDecorations spam;
+            var selectedFontFamily = contentRichTextBox.Selection.GetPropertyValue(Inline.FontFamilyProperty);
+            var selectedFontSize = contentRichTextBox.Selection.GetPropertyValue(Inline.FontSizeProperty);
 
 
             //Debug.WriteLine($"96: {textDecorations.Contains(TextDecorations.Underline)}")
 
             boldButton.IsChecked = (selectedState != DependencyProperty.UnsetValue) && (selectedState.Equals(FontWeights.Bold));
             italicsButton.IsChecked = (selectedItalics != DependencyProperty.UnsetValue) && (selectedItalics.Equals(FontStyles.Italic));
+
+            fontFamilyComboBox.SelectedItem = selectedFontFamily;
+            fontSizeComboBox.Text = (selectedFontSize).ToString();
 
             underlineButton.IsChecked = false;
             strikethroughButton.IsChecked = false;
@@ -163,6 +175,35 @@ namespace NotesApp.View
                 (contentRichTextBox.Selection.GetPropertyValue(Inline.TextDecorationsProperty) as TextDecorationCollection).TryRemove(TextDecorations.Strikethrough, out textDecorations);
                 contentRichTextBox.Selection.ApplyPropertyValue(Inline.TextDecorationsProperty, textDecorations);
             }
+        }
+
+        private void fontFamilyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            //var selectedFontFamily = contentRichTextBox.Selection.GetPropertyValue(Inline.FontFamilyProperty);
+            if(fontFamilyComboBox.SelectedItem != null)
+            {
+                contentRichTextBox.Selection.ApplyPropertyValue(Inline.FontFamilyProperty, fontFamilyComboBox.SelectedItem);
+            }
+            
+        }
+
+        private void fontSizeComboBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            contentRichTextBox.Selection.ApplyPropertyValue(Inline.FontSizeProperty, fontSizeComboBox.Text);
+
+            ////Array<double> fontSizes = fontSizeComboBox.ItemsSource
+            //double fontSize = double.Parse(fontSizeComboBox.Text);
+            //if (fontSizes.Contains(FontSize))
+            //{
+            //    contentRichTextBox.Selection.ApplyPropertyValue(Inline.FontSizeProperty, fontSizeComboBox.Text);
+            //}
+            //else
+            //{
+            //    //fontSizes.Add(fontSize);
+            //    //fontSizeComboBox.
+            //    //fontSizeComboBox.ItemsSource = fontSizes;
+            //    contentRichTextBox.Selection.ApplyPropertyValue(Inline.FontSizeProperty, fontSizeComboBox.Text);
+            //}
         }
     }
 }
