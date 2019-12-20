@@ -23,8 +23,8 @@ namespace NotesApp.ViewModel.Commands
         public bool CanExecute(object parameter)
         {
             Notebook selectedNotebook = parameter as Notebook;
-            if (VM.SelectedNotebook != null)
-                return false;
+            if (selectedNotebook != null)
+                return true;
             return false;
         }
 

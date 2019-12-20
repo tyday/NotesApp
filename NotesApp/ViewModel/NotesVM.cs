@@ -21,7 +21,7 @@ namespace NotesApp.ViewModel
             set 
             { 
                 selectedNotebook = value;
-                //TODO: get notes
+                ReadNotes();
             }
         }
 
@@ -40,6 +40,7 @@ namespace NotesApp.ViewModel
             Notes = new ObservableCollection<Note>();
 
             ReadNotebooks();
+            ReadNotes();
         }
 
         public void CreateNote(int notebookId)
@@ -52,6 +53,7 @@ namespace NotesApp.ViewModel
                 Title = "New note"
             };
             DatabaseHelper.Insert(newNote);
+            ReadNotes();
         }
 
         public void CreateNoteBook()
@@ -61,12 +63,14 @@ namespace NotesApp.ViewModel
                 Name = "New Notebook"
             };
             DatabaseHelper.Insert(newNotebook);
+            ReadNotebooks();
         }
 
         public void ReadNotebooks()
         {
             using(SQLite.SQLiteConnection conn = new SQLite.SQLiteConnection(DatabaseHelper.dbFile))
             {
+                conn.CreateTable<Notebook>();
                 var notebooks = conn.Table<Notebook>().ToList();
 
                 Notebooks.Clear();
@@ -80,24 +84,16 @@ namespace NotesApp.ViewModel
         {
             using (SQLite.SQLiteConnection conn = new SQLite.SQLiteConnection(DatabaseHelper.dbFile))
             {
-                if(SelectedNotebook != null)
+                if (SelectedNotebook != null)
                 {
-                    var notes = conn.Table<Note>().Where(n => n.Id == selectedNotebook.Id).ToList();
+                    conn.CreateTable<Note>();
+                    var notes = conn.Table<Note>().Where(n => n.NotebookId == selectedNotebook.Id).ToList();
                     Notes.Clear();
-                    foreach(var note in notes)
+                    foreach (var note in notes)
                     {
                         Notes.Add(note);
                     }
                 }
-                
-                // Wrote this on my own. I think it works but lacks the efficiency of filtering in sql call
-                //var notes = conn.Table<Note>().ToList();
-                //Notes.Clear();
-                //foreach(var note in notes)
-                //{
-                //    if (note.NotebookId == selectedNotebook.Id && selectedNotebook != null)
-                //        Notes.Add(note);
-                //}
             }
         }
     }
