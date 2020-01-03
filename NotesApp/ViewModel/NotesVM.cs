@@ -60,7 +60,8 @@ namespace NotesApp.ViewModel
         {
             Notebook newNotebook = new Notebook()
             {
-                Name = "New Notebook"
+                Name = "New Notebook",
+                UserId = int.Parse(App.UserId)
             };
             DatabaseHelper.Insert(newNotebook);
             ReadNotebooks();

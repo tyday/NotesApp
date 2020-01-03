@@ -22,6 +22,8 @@ namespace NotesApp.ViewModel
 
 		public LoginCommand LoginCommand { get; set; }
 
+		public event EventHandler HasLoggedIn;
+
 		public LoginVM()
 		{
 			RegisterCommand = new RegisterCommand(this);
@@ -40,6 +42,8 @@ namespace NotesApp.ViewModel
 				{
 					//  Successful login
 					//TODO: Establish Login
+					App.UserId = user.Id.ToString();
+					HasLoggedIn(this, new EventArgs());
 				}
 			}
 		}
@@ -55,6 +59,8 @@ namespace NotesApp.ViewModel
 				if (result)
 				{
 					// Establish registration
+					App.UserId = user.Id.ToString();
+					HasLoggedIn(this, new EventArgs());
 				}
 			}
 		}
