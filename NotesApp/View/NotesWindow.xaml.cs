@@ -54,6 +54,9 @@ namespace NotesApp.View
         {
             base.OnActivated(e);
 
+            //Running into issues so used the following line to fake userID
+            //App.UserId = 0.ToString();
+
             if (string.IsNullOrEmpty(App.UserId))
             {
                 LogInWindow logInWindow = new LogInWindow();

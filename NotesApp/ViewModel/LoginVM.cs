@@ -26,6 +26,7 @@ namespace NotesApp.ViewModel
 
 		public LoginVM()
 		{
+			User = new User();
 			RegisterCommand = new RegisterCommand(this);
 			LoginCommand = new LoginCommand(this);
 		}

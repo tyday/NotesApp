@@ -3,17 +3,32 @@ using NotesApp.ViewModel.Commands;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace NotesApp.ViewModel
 {
-    public class NotesVM
+    public class NotesVM : INotifyPropertyChanged
     {
+        private bool isEditing;
+
+        public bool IsEditing
+        {
+            get { return isEditing; }
+            set 
+            { 
+                isEditing = value;
+                OnPropertyChanged("IsEditing");
+            }
+        }
+
         public ObservableCollection<Notebook> Notebooks { get; set; }
 
         private Notebook selectedNotebook;
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public Notebook SelectedNotebook
         {
@@ -28,19 +43,34 @@ namespace NotesApp.ViewModel
         public ObservableCollection<Note> Notes { get; set; }
 
         public NewNotebookCommand NewNotebookCommand { get; set; }
-
         public NewNoteCommand NewNoteCommand { get; set; }
+        public BeginEditCommand BeginEditCommand { get; set; }
+        public ReadNotebooksCommand ReadNotebooksCommand { get; set; }
+        public HasEditedCommand HasEditedCommand { get; set; }
 
         public NotesVM()
         {
+            IsEditing = false;
+
             NewNotebookCommand = new NewNotebookCommand(this);
             NewNoteCommand = new NewNoteCommand(this);
+            BeginEditCommand = new BeginEditCommand(this);
+            HasEditedCommand = new HasEditedCommand(this);
+            ReadNotebooksCommand = new ReadNotebooksCommand(this);
 
             Notebooks = new ObservableCollection<Notebook>();
             Notes = new ObservableCollection<Note>();
 
             ReadNotebooks();
             ReadNotes();
+        }
+
+        private void OnPropertyChanged(string propertyName)
+        {
+            if(PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
 
         public void CreateNote(int notebookId)
@@ -72,7 +102,11 @@ namespace NotesApp.ViewModel
             using(SQLite.SQLiteConnection conn = new SQLite.SQLiteConnection(DatabaseHelper.dbFile))
             {
                 conn.CreateTable<Notebook>();
-                var notebooks = conn.Table<Notebook>().ToList();
+                int appUserId;
+                bool appUserIdExists = int.TryParse(App.UserId, out appUserId);
+                if (!appUserIdExists)
+                    appUserId = 0;
+                var notebooks = conn.Table<Notebook>().Where(n => n.UserId == appUserId).ToList();
 
                 Notebooks.Clear();
                 foreach(var notebook in notebooks)
@@ -95,6 +129,19 @@ namespace NotesApp.ViewModel
                         Notes.Add(note);
                     }
                 }
+            }
+        }
+        public void StartEditing()
+        {
+            IsEditing = true;
+        }
+        public void HasRenamed(Notebook notebook)
+        {
+            if(notebook != null)
+            {
+                DatabaseHelper.Update(notebook);
+                IsEditing = false;
+                ReadNotebooks();
             }
         }
     }
