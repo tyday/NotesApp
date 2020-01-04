@@ -47,6 +47,7 @@ namespace NotesApp.ViewModel
         public BeginEditCommand BeginEditCommand { get; set; }
         public ReadNotebooksCommand ReadNotebooksCommand { get; set; }
         public HasEditedCommand HasEditedCommand { get; set; }
+        public DeleteNotebookCommand DeleteNotebookCommand { get; set; }
 
         public NotesVM()
         {
@@ -57,6 +58,7 @@ namespace NotesApp.ViewModel
             BeginEditCommand = new BeginEditCommand(this);
             HasEditedCommand = new HasEditedCommand(this);
             ReadNotebooksCommand = new ReadNotebooksCommand(this);
+            DeleteNotebookCommand = new DeleteNotebookCommand(this);
 
             Notebooks = new ObservableCollection<Notebook>();
             Notes = new ObservableCollection<Note>();
@@ -143,6 +145,15 @@ namespace NotesApp.ViewModel
                 IsEditing = false;
                 ReadNotebooks();
             }
+        }
+        public void DeleteNotebook(Notebook notebook)
+        {
+            if(notebook != null)
+            {
+                DatabaseHelper.Delete(notebook);
+                ReadNotebooks();
+            }
+
         }
     }
 }

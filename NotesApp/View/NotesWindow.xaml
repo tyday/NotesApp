@@ -55,6 +55,9 @@
                             <ContextMenu>
                                 <MenuItem Header="Rename"
                                           Command="{Binding Source={StaticResource viewModel}, Path=BeginEditCommand}"/>
+                                <MenuItem Header="Delete"
+                                          Command="{Binding Source={StaticResource viewModel}, Path=DeleteNotebookCommand}"
+                                          CommandParameter="{Binding}"/>
                             </ContextMenu>
                         </Grid.ContextMenu>
                     </Grid>
